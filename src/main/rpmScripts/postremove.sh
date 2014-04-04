@@ -1,1 +1,1 @@
-printf "Starting postremove process for ${service}\n"
+# printf "Starting postremove process for ${service}\n"

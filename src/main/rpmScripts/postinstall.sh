@@ -1,11 +1,9 @@
-printf "Starting postinstall process for ${service}\n"
+# printf "Starting postinstall process for ${service}\n"
 
-/bin/tar -xf ${rpmInstallLocation}/apache-activemq-${project.version}-bin.tar.gz --directory=${rpmInstallLocation}
-
-/sbin/chkconfig --add ${service}
+/sbin/chkconfig --add ${service} >/dev/null 2>&1
 
 # Start the service
-/sbin/service ${service} start
+/sbin/service ${service} start >/dev/null 2>&1
 
 # Outputs a status
-/sbin/service ${service} status
+# /sbin/service ${service} status

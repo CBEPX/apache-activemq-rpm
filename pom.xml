@@ -15,6 +15,7 @@
         <service>activemq</service>
     </properties>
     <build>
+        <finalName>apache-activemq-${project.version}</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
@@ -37,67 +38,96 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-dependency-plugin</artifactId> <version>2.8</version> 
+                <executions> <execution> <id>copy-archive</id> <phase>prepare-package</phase> <goals> <goal>copy</goal> </goals> <inherited>false</inherited> 
+                </execution> </executions> <configuration> <artifactItems> <artifactItem> <groupId>org.apache.activemq</groupId> <artifactId>apache-activemq</artifactId> 
+                <version>${project.version}</version> <classifier>bin</classifier> <type>tar.gz</type> <overWrite>false</overWrite> <outputDirectory>${project.build.directory}/archive</outputDirectory> 
+                </artifactItem> </artifactItems> </configuration> </plugin> -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.8</version>
+                <executions>
+                    <execution>
+                        <id>unpack-archive</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.apache.activemq</groupId>
+                                    <artifactId>apache-activemq</artifactId>
+                                    <version>${project.version}</version>
+                                    <classifier>bin</classifier>
+                                    <type>tar.gz</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/archive</outputDirectory>
+                                    <excludes>**linux-x86-32**,**macosx**</excludes>
+                                </artifactItem>
+                            </artifactItems>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>rpm-maven-plugin</artifactId>
                 <version>2.1-alpha-3</version>
                 <extensions>true</extensions>
-                <executions>
-                    <execution>
-                        <id></id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>rpm</goal>
-                        </goals>
-                        <inherited>false</inherited>
-                        <configuration>
-                            <group>Applications/Internet</group>
-                            <prefix>${rpmInstallLocation}</prefix>
-                            <defineStatements>
-                                <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
-                                <!-- <defineStatement>_disable_jar_repacking 1</defineStatement> -->
-                            </defineStatements>
-                            <defaultFilemode>444</defaultFilemode>
-                            <preinstallScriptlet>
-                                <scriptFile>${project.build.directory}/rpmScripts/preinstall.sh</scriptFile>
-                            </preinstallScriptlet>
-                            <postinstallScriptlet>
-                                <scriptFile>${project.build.directory}/rpmScripts/postinstall.sh</scriptFile>
-                            </postinstallScriptlet>
-                            <preremoveScriptlet>
-                                <scriptFile>${project.build.directory}/rpmScripts/preremove.sh</scriptFile>
-                            </preremoveScriptlet>
-                            <postremoveScriptlet>
-                                <scriptFile>${project.build.directory}/rpmScripts/postremove.sh</scriptFile>
-                            </postremoveScriptlet>
-                            <defaultUsername>${serviceUser}</defaultUsername>
-                            <defaultGroupname>${serviceUser}</defaultGroupname>
-                            <defaultDirmode>775</defaultDirmode>
-                            <defaultFilemode>664</defaultFilemode>
-                            <mappings>
-                                <mapping>
-                                    <directory>${rpmInstallLocation}</directory>
-                                    <filemode>774</filemode>
-                                    <dependency>
-                                        <includes>
-                                            <include>org.apache.activemq:apache-activemq</include>
-                                        </includes>
-                                    </dependency>
-                                </mapping>
-                                <mapping>
-                                    <directory>/etc/init.d</directory>
-                                    <filemode>750</filemode>
-                                    <sources>
-                                        <softlinkSource>
-                                            <location>/etc/init.d/activemq</location>
-                                            <destination>${rpmInstallLocation}/bin/activemq</destination>
-                                        </softlinkSource>
-                                    </sources>
-                                </mapping>
-                            </mappings>
-                        </configuration>
-                    </execution>
-                </executions>
+                <!-- <executions> <execution> <id>rpm</id> <phase>package</phase> <goals> <goal>rpm</goal> </goals> <inherited>false</inherited> 
+                    </execution> </executions> -->
+                <configuration>
+                    <name>apache-activemq</name>
+                    <group>Applications/Internet</group>
+                    <prefix>${rpmInstallLocation}</prefix>
+                    <autoRequires>true</autoRequires>
+                    <defineStatements>
+                        <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
+                        <!-- <defineStatement>_disable_jar_repacking 1</defineStatement> -->
+                    </defineStatements>
+                    <defaultFilemode>444</defaultFilemode>
+                    <preinstallScriptlet>
+                        <scriptFile>${project.build.directory}/rpmScripts/preinstall.sh</scriptFile>
+                    </preinstallScriptlet>
+                    <postinstallScriptlet>
+                        <scriptFile>${project.build.directory}/rpmScripts/postinstall.sh</scriptFile>
+                    </postinstallScriptlet>
+                    <preremoveScriptlet>
+                        <scriptFile>${project.build.directory}/rpmScripts/preremove.sh</scriptFile>
+                    </preremoveScriptlet>
+                    <postremoveScriptlet>
+                        <scriptFile>${project.build.directory}/rpmScripts/postremove.sh</scriptFile>
+                    </postremoveScriptlet>
+                    <defaultUsername>${serviceUser}</defaultUsername>
+                    <defaultGroupname>${serviceUser}</defaultGroupname>
+                    <defaultDirmode>775</defaultDirmode>
+                    <defaultFilemode>664</defaultFilemode>
+                    <needarch>x86_64</needarch>
+                    <mappings>
+                        <mapping>
+                            <directory>${rpmInstallLocation}/</directory>
+                            <filemode>774</filemode>
+                            <sources>
+                                <source>
+                                    <location>${project.build.directory}/archive/apache-activemq-5.9.0/</location>
+                                </source>
+                            </sources>
+                        </mapping>
+                        <mapping>
+                            <directory>/etc/init.d</directory>
+                            <filemode>750</filemode>
+                            <sources>
+                                <softlinkSource>
+                                    <location>${rpmInstallLocation}/bin/linux-x86-64/activemq</location>
+                                </softlinkSource>
+                            </sources>
+                        </mapping>
+                    </mappings>
+                </configuration>
             </plugin>
         </plugins>
         <pluginManagement>
@@ -124,6 +154,19 @@
                                         <ignore></ignore>
                                     </action>
                                 </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-dependency-plugin</artifactId>
+                                        <versionRange>[2.8,)</versionRange>
+                                        <goals>
+                                            <goal>unpack</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
@@ -131,14 +174,7 @@
             </plugins>
         </pluginManagement>
     </build>
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>apache-activemq</artifactId>
-            <version>${project.version}</version>
-            <classifier>bin</classifier>
-            <type>tar.gz</type>
-        </dependency>
-    </dependencies>
+    <!-- <dependencies> <dependency> <groupId>org.apache.activemq</groupId> <artifactId>apache-activemq</artifactId> <version>${project.version}</version> 
+        <classifier>bin</classifier> <type>tar.gz</type> </dependency> </dependencies> -->
 </project>
 
