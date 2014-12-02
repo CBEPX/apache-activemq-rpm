@@ -89,7 +89,6 @@
                         <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
                         <!-- <defineStatement>_disable_jar_repacking 1</defineStatement> -->
                     </defineStatements>
-                    <defaultFilemode>444</defaultFilemode>
                     <preinstallScriptlet>
                         <scriptFile>${project.build.directory}/rpmScripts/preinstall.sh</scriptFile>
                     </preinstallScriptlet>
@@ -110,10 +109,9 @@
                     <mappings>
                         <mapping>
                             <directory>${rpmInstallLocation}/</directory>
-                            <filemode>774</filemode>
                             <sources>
                                 <source>
-                                    <location>${project.build.directory}/archive/apache-activemq-5.9.0/</location>
+                                    <location>${project.build.directory}/archive/apache-activemq-${project.version}/</location>
                                 </source>
                             </sources>
                         </mapping>
